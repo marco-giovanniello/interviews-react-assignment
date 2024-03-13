@@ -1,10 +1,10 @@
-import { Cart, Products } from "./components/Products.tsx"
+import { Cart, Products } from "../components/Products.tsx"
 import { Box, CssBaseline } from "@mui/material"
-import SearchAppBar from "./components/layout/SearchAppBar.tsx"
-import { Categories } from "./components/layout/Categories.tsx"
+import SearchAppBar from "../components/layout/SearchAppBar.tsx"
+import { Categories } from "../components/layout/Categories.tsx"
 import { useState } from "react"
 
-function App() {
+function Index() {
 	const [cart, setCart] = useState<Cart>()
 
 	function onCartChange(cart: Cart) {
@@ -28,4 +28,4 @@ function App() {
 	)
 }
 
-export default App
+export default Index

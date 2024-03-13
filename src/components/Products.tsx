@@ -67,17 +67,19 @@ export const Products = ({
 		}).then(async (response) => {
 			if (response.ok) {
 				const cart = await response.json()
-				setProducts(
-					products.map((product) => {
-						if (product.id === productId) {
-							return {
-								...product,
-								itemInCart: (product.itemInCart || 0) + quantity,
-								loading: false,
+				dispatch(
+					setProducts(
+						products.map((product) => {
+							if (product.id === productId) {
+								return {
+									...product,
+									itemInCart: (product.itemInCart || 0) + quantity,
+									loading: false,
+								}
 							}
-						}
-						return product
-					})
+							return product
+						})
+					)
 				)
 				onCartChange(cart)
 			}
@@ -90,7 +92,7 @@ export const Products = ({
 				<Box height="100%">
 					<Grid container spacing={2} p={2}>
 						{products.map((product) => (
-							<Grid item xs={4}>
+							<Grid key={product.id} item xs={4}>
 								{/* I removed :D */}
 								<Card key={product.id} style={{ width: "100%" }}>
 									<CardMedia

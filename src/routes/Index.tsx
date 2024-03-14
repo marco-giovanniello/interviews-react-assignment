@@ -1,15 +1,11 @@
-import { Cart, Products } from "../components/Products.tsx"
+import { Products } from "../components/Products.tsx"
 import { Box, CssBaseline } from "@mui/material"
 import SearchAppBar from "../components/layout/SearchAppBar.tsx"
 import { Categories } from "../components/layout/Categories.tsx"
-import { useState } from "react"
+import { useAppSelector } from "../hooks/custom.tsx"
 
 function Index() {
-	const [cart, setCart] = useState<Cart>()
-
-	function onCartChange(cart: Cart) {
-		setCart(cart)
-	}
+	const cart = useAppSelector((state) => state.cart.value)
 
 	return (
 		<Box height="100vh" display="flex" flexDirection="column">
@@ -21,7 +17,8 @@ function Index() {
 			<Box flex={1} display="flex" flexDirection="row">
 				<Categories />
 				<Box flex={1}>
-					<Products onCartChange={onCartChange} />
+					<Products />{" "}
+					{/* Removed prop drilling of function onCartChange into Products component and setted a reducer */}
 				</Box>
 			</Box>
 		</Box>

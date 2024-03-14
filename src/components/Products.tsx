@@ -13,7 +13,13 @@ import {
 import RemoveIcon from "@mui/icons-material/Remove"
 import AddIcon from "@mui/icons-material/Add"
 import { useAppDispatch, useAppSelector } from "../hooks/custom"
-import { getProducts, setProducts } from "../store/slices/productsSlice"
+import {
+	addToCart,
+	getProducts,
+	removeFromCart,
+	toggleLoading,
+} from "../store/slices/productsSlice"
+import { setCart } from "../store/slices/cartSlice"
 
 export type Product = {
 	id: number
@@ -30,34 +36,19 @@ export type Cart = {
 	totalPrice: number
 	totalItems: number
 }
-export const Products = ({
-	onCartChange,
-}: {
-	onCartChange: (cart: Cart) => void
-}) => {
+export const Products = () => {
 	const dispatch = useAppDispatch()
 	const products = useAppSelector((state) => state.products.value)
 	useEffect(() => {
 		dispatch(getProducts())
+		//Replaced by useAppDispatch
 	}, [])
 	useEffect(() => {
 		console.dir(products)
 	}, [products])
 
-	function addToCart(productId: number, quantity: number) {
-		dispatch(
-			setProducts(
-				products.map((product) => {
-					if (product.id === productId) {
-						return {
-							...product,
-							loading: true,
-						}
-					}
-					return product
-				})
-			)
-		)
+	function _addToCart(productId: number, quantity: number) {
+		dispatch(toggleLoading(productId))
 		fetch("/cart", {
 			method: "POST",
 			headers: {
@@ -67,29 +58,19 @@ export const Products = ({
 		}).then(async (response) => {
 			if (response.ok) {
 				const cart = await response.json()
-				dispatch(
-					setProducts(
-						products.map((product) => {
-							if (product.id === productId) {
-								return {
-									...product,
-									itemInCart: (product.itemInCart || 0) + quantity,
-									loading: false,
-								}
-							}
-							return product
-						})
-					)
-				)
-				onCartChange(cart)
+				if (quantity === 1) dispatch(addToCart(productId))
+				else dispatch(removeFromCart(productId))
+				dispatch(toggleLoading(productId))
+				dispatch(setCart(cart))
 			}
+			// Used store by redux and custom hooks useAppDispatch and useAppSelector for accessing and modify states of productSlice and cartSlice
 		})
 	}
 
 	return (
 		<>
 			{products && products.length > 0 ? (
-				<Box height="100%">
+				<Box boxSizing="border-box" height="100%">
 					<Grid container spacing={2} p={2}>
 						{products.map((product) => (
 							<Grid key={product.id} item xs={4}>
@@ -133,7 +114,7 @@ export const Products = ({
 												disabled={product.loading}
 												aria-label="delete"
 												size="small"
-												onClick={() => addToCart(product.id, -1)}
+												onClick={() => _addToCart(product.id, -1)}
 											>
 												<RemoveIcon fontSize="small" />
 											</IconButton>
@@ -146,7 +127,7 @@ export const Products = ({
 												disabled={product.loading}
 												aria-label="add"
 												size="small"
-												onClick={() => addToCart(product.id, 1)}
+												onClick={() => _addToCart(product.id, 1)}
 											>
 												<AddIcon fontSize="small" />
 											</IconButton>

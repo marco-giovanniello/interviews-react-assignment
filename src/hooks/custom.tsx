@@ -1,6 +1,8 @@
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux"
 import store from "../store/store"
 
+//Declaring custom useSelectore and useDispatch for typescript
+
 export type RootState = ReturnType<typeof store.getState>
 
 export type AppDispatch = typeof store.dispatch

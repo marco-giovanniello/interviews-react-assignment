@@ -34,29 +34,6 @@ export const getProducts = createAsyncThunk(
 		return data
 	}
 )
-/*
-export const getProductsByCategory = createAsyncThunk(
-	"products/getProductsByCategory",
-	async (params: any) => {
-		let url = `/products?category=${params.category}&limit=${params.limit}`
-		const data = await useFetch(url)
-		return data
-	}
-)
-export const getProductsBySearch = createAsyncThunk(
-	"products/getProductsBySearch",
-	async (params: any) => {
-		let url
-		if (params.category) {
-			url = `/products?category=${params.category}&q=${params.searchquery}&limit=${params.limit}`
-		} else {
-			url = `/products?q=${params.searchquery}&limit=${params.limit}`
-		}
-		const data = await useFetch(url)
-		return data
-	}
-)
-*/
 interface ProductsState {
 	value: Product[]
 	limit: number

@@ -3,5 +3,5 @@ export default async function useFetch(uri: string) {
 	const response = await fetch(uri)
 	data = await response.json()
 
-	return data.products
+	return data
 }

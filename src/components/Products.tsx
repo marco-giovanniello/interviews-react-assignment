@@ -16,7 +16,6 @@ import { useAppDispatch, useAppSelector } from "../hooks/custom"
 import {
 	addToCart,
 	getProducts,
-	getProductsByCategory,
 	removeFromCart,
 	setLimit,
 	toggleLoading,
@@ -40,20 +39,18 @@ export type Cart = {
 }
 export const Products = () => {
 	const dispatch = useAppDispatch()
-	const products = useAppSelector((state) => state.products.value)
-	const productsLoading = useAppSelector((state) => state.products.loading)
-	const limit = useAppSelector((state) => state.products.limit)
-	const category = useAppSelector((state) => state.products.category)
+	const products = useAppSelector((state) => state.products)
+	const productsQuery = {
+		limit: products.limit,
+		searchQuery: products.search,
+		category: products.category,
+	}
 
 	//First get of products, plus getting products by category. All on dependency of limit(handling infinite scroll) and category
 	useEffect(() => {
-		console.log(limit)
-		if (category === "") {
-			dispatch(getProducts(limit))
-		} else {
-			dispatch(getProductsByCategory({ category: category, limit: limit }))
-		}
-	}, [limit, category])
+		console.log(productsQuery)
+		dispatch(getProducts(productsQuery))
+	}, [products.limit, products.category, products.search])
 
 	//Use of infinite scroll
 	useEffect(() => {
@@ -62,12 +59,14 @@ export const Products = () => {
 			const currentHeight =
 				(e.target as Document).documentElement.scrollTop + window.innerHeight
 			if (currentHeight + 1 >= scrollHeight) {
-				dispatch(setLimit())
+				console.log(products.loading)
+				console.log(products.hasMore)
+				if (!products.loading && products.hasMore) dispatch(setLimit())
 			}
 		}
 		window.addEventListener("scroll", handleScroll)
 		return () => window.removeEventListener("scroll", handleScroll)
-	}, [limit])
+	}, [products])
 
 	//function for adding products to cart
 	function _addToCart(productId: number, quantity: number) {
@@ -92,10 +91,10 @@ export const Products = () => {
 
 	return (
 		<>
-			{products && products.length > 0 ? (
+			{products.total > 0 && (
 				<Box boxSizing="border-box" height="100%">
 					<Grid container spacing={2} p={2}>
-						{products.map((product) => (
+						{products.value.map((product) => (
 							<Grid key={product.id} item xs={4}>
 								{/* I removed :D */}
 								<Card
@@ -172,7 +171,7 @@ export const Products = () => {
 							</Grid>
 						))}
 					</Grid>
-					{productsLoading && (
+					{products.loading && (
 						<Box
 							width="100%"
 							display="flex"
@@ -183,7 +182,8 @@ export const Products = () => {
 						</Box>
 					)}
 				</Box>
-			) : (
+			)}
+			{products.total === 0 && products.loading && (
 				<Box
 					boxSizing="border-box"
 					height="100%"
@@ -192,6 +192,20 @@ export const Products = () => {
 					alignItems="center"
 				>
 					<CircularProgress size={100} />
+				</Box>
+			)}
+
+			{products.total === 0 && !products.loading && (
+				<Box
+					boxSizing="border-box"
+					height="100%"
+					display="flex"
+					justifyContent="center"
+					alignItems="center"
+				>
+					<Typography gutterBottom variant="h6" component="div">
+						The search did not return any result
+					</Typography>
 				</Box>
 			)}
 		</>

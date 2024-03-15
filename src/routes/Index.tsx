@@ -2,18 +2,12 @@ import { Products } from "../components/Products.tsx"
 import { Box, CssBaseline } from "@mui/material"
 import SearchAppBar from "../components/layout/SearchAppBar.tsx"
 import { Categories } from "../components/layout/Categories.tsx"
-import { useAppSelector } from "../hooks/custom.tsx"
 
 function Index() {
-	const cart = useAppSelector((state) => state.cart.value)
-
 	return (
 		<Box height="100vh" display="flex" flexDirection="column">
 			<CssBaseline />
-			<SearchAppBar
-				quantity={cart?.totalItems || 0}
-				price={cart?.totalPrice || 0}
-			/>
+			<SearchAppBar />
 			<Box flex={1} display="flex" flexDirection="row">
 				<Categories />
 				<Box flex={1}>

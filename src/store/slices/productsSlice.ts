@@ -2,13 +2,39 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { Product } from "../../components/Products"
 import useFetch from "../../hooks/fetchHook"
 
+interface queryParams {
+	limit: number
+	category?: string
+	searchQuery?: string
+}
+
 export const getProducts = createAsyncThunk(
 	"products/getProducts",
-	async (limit: number) => {
-		const data = await useFetch(`/products?limit=${limit}`)
+	async (params: queryParams) => {
+		console.log("querying")
+		let url
+		if (params.category?.toUpperCase() === "ALL" && params.searchQuery === "") {
+			url = `/products?limit=${params.limit}`
+		} else if (
+			params.category?.toUpperCase() === "ALL" &&
+			params.searchQuery !== ""
+		) {
+			url = `/products?q=${params.searchQuery}&limit=${params.limit}`
+		} else if (
+			params.category?.toUpperCase() !== "ALL" &&
+			params.searchQuery === ""
+		) {
+			url = `/products?category=${params.category}&limit=${params.limit}`
+		} else {
+			url = `/products?q=${params.searchQuery}&category=${params.category}&limit=${params.limit}`
+		}
+
+		const data = await useFetch(url)
+		console.log(data)
 		return data
 	}
 )
+/*
 export const getProductsByCategory = createAsyncThunk(
 	"products/getProductsByCategory",
 	async (params: any) => {
@@ -17,21 +43,38 @@ export const getProductsByCategory = createAsyncThunk(
 		return data
 	}
 )
-
+export const getProductsBySearch = createAsyncThunk(
+	"products/getProductsBySearch",
+	async (params: any) => {
+		let url
+		if (params.category) {
+			url = `/products?category=${params.category}&q=${params.searchquery}&limit=${params.limit}`
+		} else {
+			url = `/products?q=${params.searchquery}&limit=${params.limit}`
+		}
+		const data = await useFetch(url)
+		return data
+	}
+)
+*/
 interface ProductsState {
 	value: Product[]
 	limit: number
 	search: string
 	category: string
 	loading: boolean
+	hasMore: boolean
+	total: number
 }
 
 const initialState: ProductsState = {
 	value: [],
 	limit: 15,
 	search: "",
-	category: "",
+	category: "All",
 	loading: false,
+	hasMore: false,
+	total: 0,
 }
 
 export const productsSlice = createSlice({
@@ -41,6 +84,9 @@ export const productsSlice = createSlice({
 		setCategory: (state, action) => {
 			state.category = action.payload
 			state.limit = 15
+		},
+		setSearching: (state, action) => {
+			state.search = action.payload
 		},
 		setLimit: (state) => {
 			state.limit += 15
@@ -87,17 +133,15 @@ export const productsSlice = createSlice({
 	},
 	extraReducers: (builder) => {
 		builder.addCase(getProducts.fulfilled, (state, action) => {
-			state.value = action.payload
+			const { products, hasMore, total } = action.payload
+			console.log(hasMore)
+			console.log(total)
+			state.value = products
+			state.hasMore = hasMore
+			state.total = total
 			state.loading = false
 		})
 		builder.addCase(getProducts.pending, (state) => {
-			state.loading = true
-		})
-		builder.addCase(getProductsByCategory.fulfilled, (state, action) => {
-			state.value = action.payload
-			state.loading = false
-		})
-		builder.addCase(getProductsByCategory.pending, (state) => {
 			state.loading = true
 		})
 	},
@@ -110,6 +154,7 @@ export const {
 	toggleLoading,
 	setCategory,
 	setLimit,
+	setSearching,
 } = productsSlice.actions
 
 export const productsReducer = productsSlice.reducer

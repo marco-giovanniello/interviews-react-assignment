@@ -7,6 +7,9 @@ import InputBase from "@mui/material/InputBase"
 import SearchIcon from "@mui/icons-material/Search"
 import { Badge } from "@mui/material"
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart"
+import { useAppDispatch, useAppSelector } from "../../hooks/custom"
+import { ChangeEvent } from "react"
+import { setSearching } from "../../store/slices/productsSlice"
 
 const Search = styled("div")(({ theme }) => ({
 	position: "relative",
@@ -51,13 +54,17 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 	},
 }))
 
-export default function SearchAppBar({
-	quantity,
-	price,
-}: {
-	quantity: number
-	price: number
-}) {
+export default function SearchAppBar() {
+	const cart = useAppSelector((state) => state.cart.value)
+	const searchProducts = useAppSelector((state) => state.products.search)
+	const dispatch = useAppDispatch()
+
+	const handleInputChange = (e: ChangeEvent) => {
+		//Synchronizing input of searchbar to the state.products.search
+		const target = e.target as HTMLInputElement
+		dispatch(setSearching(target.value))
+	}
+
 	return (
 		<Box>
 			<AppBar position="relative">
@@ -77,6 +84,8 @@ export default function SearchAppBar({
 						<StyledInputBase
 							placeholder="Search…"
 							inputProps={{ "aria-label": "search" }}
+							onChange={handleInputChange}
+							value={searchProducts}
 						/>
 					</Search>
 					<Box display="flex" flexDirection="row" mx={2}>
@@ -84,10 +93,10 @@ export default function SearchAppBar({
 							Total:
 						</Typography>
 						<Typography variant="h6" noWrap component="div">
-							$ {(price || 0).toFixed(2)}
+							$ {(cart?.totalPrice || 0).toFixed(2)}
 						</Typography>
 					</Box>
-					<Badge badgeContent={quantity || 0} color="secondary">
+					<Badge badgeContent={cart?.totalItems || 0} color="secondary">
 						<ShoppingCartIcon />
 					</Badge>
 				</Toolbar>

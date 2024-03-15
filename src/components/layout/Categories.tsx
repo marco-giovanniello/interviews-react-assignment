@@ -6,10 +6,7 @@ import {
 	ListItemText,
 } from "@mui/material"
 import { useAppDispatch } from "../../hooks/custom"
-import {
-	getProducts,
-	getProductsByCategory,
-} from "../../store/slices/productsSlice"
+import { setCategory } from "../../store/slices/productsSlice"
 
 const drawerWidth = 180
 
@@ -29,11 +26,7 @@ export const Categories = () => {
 	const dispatch = useAppDispatch()
 
 	const handleCategoryClick = (text: string) => {
-		if (text.toUpperCase() !== "ALL") {
-			dispatch(getProductsByCategory(text))
-		} else {
-			dispatch(getProducts())
-		}
+		dispatch(setCategory(text))
 	}
 
 	return (

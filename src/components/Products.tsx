@@ -16,7 +16,9 @@ import { useAppDispatch, useAppSelector } from "../hooks/custom"
 import {
 	addToCart,
 	getProducts,
+	getProductsByCategory,
 	removeFromCart,
+	setLimit,
 	toggleLoading,
 } from "../store/slices/productsSlice"
 import { setCart } from "../store/slices/cartSlice"
@@ -39,14 +41,35 @@ export type Cart = {
 export const Products = () => {
 	const dispatch = useAppDispatch()
 	const products = useAppSelector((state) => state.products.value)
-	useEffect(() => {
-		dispatch(getProducts())
-		//Replaced by useAppDispatch
-	}, [])
-	useEffect(() => {
-		console.dir(products)
-	}, [products])
+	const productsLoading = useAppSelector((state) => state.products.loading)
+	const limit = useAppSelector((state) => state.products.limit)
+	const category = useAppSelector((state) => state.products.category)
 
+	//First get of products, plus getting products by category. All on dependency of limit(handling infinite scroll) and category
+	useEffect(() => {
+		console.log(limit)
+		if (category === "") {
+			dispatch(getProducts(limit))
+		} else {
+			dispatch(getProductsByCategory({ category: category, limit: limit }))
+		}
+	}, [limit, category])
+
+	//Use of infinite scroll
+	useEffect(() => {
+		const handleScroll = (e: Event) => {
+			const scrollHeight = (e.target as Document).documentElement.scrollHeight
+			const currentHeight =
+				(e.target as Document).documentElement.scrollTop + window.innerHeight
+			if (currentHeight + 1 >= scrollHeight) {
+				dispatch(setLimit())
+			}
+		}
+		window.addEventListener("scroll", handleScroll)
+		return () => window.removeEventListener("scroll", handleScroll)
+	}, [limit])
+
+	//function for adding products to cart
 	function _addToCart(productId: number, quantity: number) {
 		dispatch(toggleLoading(productId))
 		fetch("/cart", {
@@ -75,7 +98,29 @@ export const Products = () => {
 						{products.map((product) => (
 							<Grid key={product.id} item xs={4}>
 								{/* I removed :D */}
-								<Card key={product.id} style={{ width: "100%" }}>
+								<Card
+									key={product.id}
+									style={{ width: "100%" }}
+									sx={{ position: "relative" }}
+								>
+									{product.loading && (
+										<Box
+											sx={{
+												backgroundColor: "black",
+												opacity: "40%",
+											}}
+											position="absolute"
+											width="100%"
+											height="100%"
+											display="flex"
+											justifyContent="center"
+											alignItems="center"
+											left={0}
+											top={0}
+										>
+											<CircularProgress size={50} />
+										</Box>
+									)}
 									<CardMedia
 										component="img"
 										height="150"
@@ -100,16 +145,6 @@ export const Products = () => {
 											flexDirection="row"
 											alignItems="center"
 										>
-											<Box
-												position="absolute"
-												left={0}
-												right={0}
-												top={0}
-												bottom={0}
-												textAlign="center"
-											>
-												{product.loading && <CircularProgress size={20} />}
-											</Box>
 											<IconButton
 												disabled={product.loading}
 												aria-label="delete"
@@ -137,9 +172,27 @@ export const Products = () => {
 							</Grid>
 						))}
 					</Grid>
+					{productsLoading && (
+						<Box
+							width="100%"
+							display="flex"
+							justifyContent="center"
+							alignItems="center"
+						>
+							<CircularProgress size={40} />
+						</Box>
+					)}
 				</Box>
 			) : (
-				"Loading"
+				<Box
+					boxSizing="border-box"
+					height="100%"
+					display="flex"
+					justifyContent="center"
+					alignItems="center"
+				>
+					<CircularProgress size={100} />
+				</Box>
 			)}
 		</>
 	)

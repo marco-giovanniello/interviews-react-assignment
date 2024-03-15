@@ -4,32 +4,47 @@ import useFetch from "../../hooks/fetchHook"
 
 export const getProducts = createAsyncThunk(
 	"products/getProducts",
-	async () => {
-		const data = await useFetch("/products?limit=200")
-		return await data
+	async (limit: number) => {
+		const data = await useFetch(`/products?limit=${limit}`)
+		return data
 	}
 )
 export const getProductsByCategory = createAsyncThunk(
 	"products/getProductsByCategory",
-	async (category: string) => {
-		let url = "/products?category=" + category
+	async (params: any) => {
+		let url = `/products?category=${params.category}&limit=${params.limit}`
 		const data = await useFetch(url)
-		return await data
+		return data
 	}
 )
 
 interface ProductsState {
 	value: Product[]
+	limit: number
+	search: string
+	category: string
+	loading: boolean
 }
 
 const initialState: ProductsState = {
 	value: [],
+	limit: 15,
+	search: "",
+	category: "",
+	loading: false,
 }
 
 export const productsSlice = createSlice({
 	name: "products",
 	initialState,
 	reducers: {
+		setCategory: (state, action) => {
+			state.category = action.payload
+			state.limit = 15
+		},
+		setLimit: (state) => {
+			state.limit += 15
+		},
 		setProducts: (state, action) => {
 			state.value = action.payload
 		},
@@ -73,14 +88,28 @@ export const productsSlice = createSlice({
 	extraReducers: (builder) => {
 		builder.addCase(getProducts.fulfilled, (state, action) => {
 			state.value = action.payload
+			state.loading = false
+		})
+		builder.addCase(getProducts.pending, (state) => {
+			state.loading = true
 		})
 		builder.addCase(getProductsByCategory.fulfilled, (state, action) => {
 			state.value = action.payload
+			state.loading = false
+		})
+		builder.addCase(getProductsByCategory.pending, (state) => {
+			state.loading = true
 		})
 	},
 })
 
-export const { setProducts, addToCart, removeFromCart, toggleLoading } =
-	productsSlice.actions
+export const {
+	setProducts,
+	addToCart,
+	removeFromCart,
+	toggleLoading,
+	setCategory,
+	setLimit,
+} = productsSlice.actions
 
 export const productsReducer = productsSlice.reducer

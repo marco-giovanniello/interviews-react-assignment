@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
-import { Product } from "../../components/Products"
+import { Product } from "../../components/layout/index/Products"
 import useFetch from "../../hooks/fetchHook"
 
 interface queryParams {

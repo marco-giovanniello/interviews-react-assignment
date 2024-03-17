@@ -1,7 +1,8 @@
-import { Products } from "../components/Products.tsx"
+import { Products } from "../components/layout/index/Products.tsx"
 import { Box, CssBaseline } from "@mui/material"
-import SearchAppBar from "../components/layout/SearchAppBar.tsx"
-import { Categories } from "../components/layout/Categories.tsx"
+import SearchAppBar from "../components/layout/index/SearchAppBar.tsx"
+import { Categories } from "../components/layout/index/Categories.tsx"
+import Cart from "../components/layout/index/Cart.tsx"
 
 function Index() {
 	return (
@@ -14,6 +15,7 @@ function Index() {
 					<Products />{" "}
 					{/* Removed prop drilling of function onCartChange into Products component and setted a reducer */}
 				</Box>
+				<Cart />
 			</Box>
 		</Box>
 	)

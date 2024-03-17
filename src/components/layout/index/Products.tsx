@@ -12,15 +12,15 @@ import {
 } from "@mui/material"
 import RemoveIcon from "@mui/icons-material/Remove"
 import AddIcon from "@mui/icons-material/Add"
-import { useAppDispatch, useAppSelector } from "../hooks/custom"
-import {
-	addToCart,
-	getProducts,
-	removeFromCart,
-	setLimit,
-	toggleLoading,
-} from "../store/slices/productsSlice"
-import { setCart } from "../store/slices/cartSlice"
+import { useAppDispatch, useAppSelector } from "../../../hooks/custom"
+import { getProducts, setLimit } from "../../../store/slices/productsSlice"
+
+import { useCart } from "../../../hooks/useCart"
+
+export type detailedCart = {
+	product: Product
+	quantity: number
+}
 
 export type Product = {
 	id: number
@@ -33,7 +33,7 @@ export type Product = {
 }
 
 export type Cart = {
-	items: Product[]
+	items: detailedCart[]
 	totalPrice: number
 	totalItems: number
 }
@@ -45,6 +45,8 @@ export const Products = () => {
 		searchQuery: products.search,
 		category: products.category,
 	}
+
+	const handleCart = useCart()
 
 	//First get of products, plus getting products by category. All on dependency of limit(handling infinite scroll) and category
 	useEffect(() => {
@@ -67,27 +69,6 @@ export const Products = () => {
 		window.addEventListener("scroll", handleScroll)
 		return () => window.removeEventListener("scroll", handleScroll)
 	}, [products])
-
-	//function for adding products to cart
-	function _addToCart(productId: number, quantity: number) {
-		dispatch(toggleLoading(productId))
-		fetch("/cart", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({ productId, quantity }),
-		}).then(async (response) => {
-			if (response.ok) {
-				const cart = await response.json()
-				if (quantity === 1) dispatch(addToCart(productId))
-				else dispatch(removeFromCart(productId))
-				dispatch(toggleLoading(productId))
-				dispatch(setCart(cart))
-			}
-			// Used store by redux and custom hooks useAppDispatch and useAppSelector for accessing and modify states of productSlice and cartSlice
-		})
-	}
 
 	return (
 		<>
@@ -126,15 +107,24 @@ export const Products = () => {
 										image={product.imageUrl}
 									/>
 									<CardContent>
-										<Typography gutterBottom variant="h6" component="div">
+										<Typography
+											gutterBottom
+											variant="h6"
+											component="div"
+											color="primary.dark"
+										>
 											{product.name}
 										</Typography>
-										<Typography variant="body2" color="text.secondary">
+										<Typography variant="body2" color="text">
 											Lorem ipsum dolor sit amet, consectetur adipiscing elit,
 										</Typography>
 									</CardContent>
 									<CardActions>
-										<Typography variant="h6" component="div">
+										<Typography
+											variant="h6"
+											component="div"
+											color="primary.dark"
+										>
 											${product.price}
 										</Typography>
 										<Box flexGrow={1} />
@@ -148,7 +138,13 @@ export const Products = () => {
 												disabled={product.loading}
 												aria-label="delete"
 												size="small"
-												onClick={() => _addToCart(product.id, -1)}
+												onClick={
+													() =>
+														handleCart(
+															product.id,
+															-1
+														) /*Removing from cart using custom hook*/
+												}
 											>
 												<RemoveIcon fontSize="small" />
 											</IconButton>
@@ -161,7 +157,13 @@ export const Products = () => {
 												disabled={product.loading}
 												aria-label="add"
 												size="small"
-												onClick={() => _addToCart(product.id, 1)}
+												onClick={
+													() =>
+														handleCart(
+															product.id,
+															1
+														) /*Adding to cart using custom hook*/
+												}
 											>
 												<AddIcon fontSize="small" />
 											</IconButton>
@@ -203,7 +205,12 @@ export const Products = () => {
 					justifyContent="center"
 					alignItems="center"
 				>
-					<Typography gutterBottom variant="h6" component="div">
+					<Typography
+						gutterBottom
+						variant="h6"
+						component="div"
+						color="secondary.dark"
+					>
 						The search did not return any result
 					</Typography>
 				</Box>

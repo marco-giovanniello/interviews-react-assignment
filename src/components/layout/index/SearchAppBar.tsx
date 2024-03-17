@@ -7,9 +7,10 @@ import InputBase from "@mui/material/InputBase"
 import SearchIcon from "@mui/icons-material/Search"
 import { Badge } from "@mui/material"
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart"
-import { useAppDispatch, useAppSelector } from "../../hooks/custom"
+import { useAppDispatch, useAppSelector } from "../../../hooks/custom"
 import { ChangeEvent } from "react"
-import { setSearching } from "../../store/slices/productsSlice"
+import { setSearching } from "../../../store/slices/productsSlice"
+import { toggleShowCart } from "../../../store/slices/cartSlice"
 
 const Search = styled("div")(({ theme }) => ({
 	position: "relative",
@@ -58,6 +59,9 @@ export default function SearchAppBar() {
 	const cart = useAppSelector((state) => state.cart.value)
 	const searchProducts = useAppSelector((state) => state.products.search)
 	const dispatch = useAppDispatch()
+	const handleCartIconClick = () => {
+		dispatch(toggleShowCart())
+	}
 
 	const handleInputChange = (e: ChangeEvent) => {
 		//Synchronizing input of searchbar to the state.products.search
@@ -96,9 +100,14 @@ export default function SearchAppBar() {
 							$ {(cart?.totalPrice || 0).toFixed(2)}
 						</Typography>
 					</Box>
-					<Badge badgeContent={cart?.totalItems || 0} color="secondary">
-						<ShoppingCartIcon />
-					</Badge>
+					<Box>
+						<Badge badgeContent={cart?.totalItems || 0} color="secondary">
+							<ShoppingCartIcon
+								sx={{ cursor: "pointer" }}
+								onClick={handleCartIconClick}
+							/>
+						</Badge>
+					</Box>
 				</Toolbar>
 			</AppBar>
 		</Box>

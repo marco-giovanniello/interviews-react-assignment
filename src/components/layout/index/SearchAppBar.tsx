@@ -5,12 +5,13 @@ import Toolbar from "@mui/material/Toolbar"
 import Typography from "@mui/material/Typography"
 import InputBase from "@mui/material/InputBase"
 import SearchIcon from "@mui/icons-material/Search"
-import { Badge } from "@mui/material"
+import { Avatar, Badge } from "@mui/material"
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart"
 import { useAppDispatch, useAppSelector } from "../../../hooks/custom"
 import { ChangeEvent } from "react"
 import { setSearching } from "../../../store/slices/productsSlice"
 import { toggleShowCart } from "../../../store/slices/cartSlice"
+import Logo from "/FreshCartMarket.svg"
 
 const Search = styled("div")(({ theme }) => ({
 	position: "relative",
@@ -73,6 +74,12 @@ export default function SearchAppBar() {
 		<Box>
 			<AppBar position="relative">
 				<Toolbar>
+					<Avatar
+						sx={{
+							mr: 1,
+						}}
+						src={Logo}
+					/>
 					<Typography
 						variant="h6"
 						noWrap

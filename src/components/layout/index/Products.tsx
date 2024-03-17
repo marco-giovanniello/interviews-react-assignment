@@ -135,7 +135,7 @@ export const Products = () => {
 											alignItems="center"
 										>
 											<IconButton
-												disabled={product.loading}
+												disabled={!product.itemInCart || product.loading}
 												aria-label="delete"
 												size="small"
 												onClick={

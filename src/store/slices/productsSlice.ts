@@ -6,12 +6,12 @@ interface queryParams {
 	limit: number
 	category?: string
 	searchQuery?: string
+	page?: number
 }
 
 export const getProducts = createAsyncThunk(
 	"products/getProducts",
 	async (params: queryParams) => {
-		console.log("querying")
 		let url
 		if (params.category?.toUpperCase() === "ALL" && params.searchQuery === "") {
 			url = `/products?limit=${params.limit}`
@@ -30,10 +30,35 @@ export const getProducts = createAsyncThunk(
 		}
 
 		const data = await useFetch(url)
-		console.log(data)
 		return data
 	}
 )
+
+export const getInfiniteProducts = createAsyncThunk(
+	"products/getInfiniteProducts",
+	async (params: queryParams) => {
+		let url
+		if (params.category?.toUpperCase() === "ALL" && params.searchQuery === "") {
+			url = `/products?limit=${params.limit}&page=${params.page}`
+		} else if (
+			params.category?.toUpperCase() === "ALL" &&
+			params.searchQuery !== ""
+		) {
+			url = `/products?q=${params.searchQuery}&limit=${params.limit}&page=${params.page}`
+		} else if (
+			params.category?.toUpperCase() !== "ALL" &&
+			params.searchQuery === ""
+		) {
+			url = `/products?category=${params.category}&limit=${params.limit}&page=${params.page}`
+		} else {
+			url = `/products?q=${params.searchQuery}&category=${params.category}&limit=${params.limit}&page=${params.page}`
+		}
+
+		const data = await useFetch(url)
+		return data
+	}
+)
+
 interface ProductsState {
 	value: Product[]
 	limit: number
@@ -42,6 +67,7 @@ interface ProductsState {
 	loading: boolean
 	hasMore: boolean
 	total: number
+	page: number
 }
 
 const initialState: ProductsState = {
@@ -52,6 +78,7 @@ const initialState: ProductsState = {
 	loading: false,
 	hasMore: false,
 	total: 0,
+	page: 0,
 }
 
 export const productsSlice = createSlice({
@@ -67,6 +94,9 @@ export const productsSlice = createSlice({
 		},
 		setLimit: (state) => {
 			state.limit += 15
+		},
+		setPage: (state) => {
+			state.page += 1
 		},
 		setProducts: (state, action) => {
 			state.value = action.payload
@@ -111,14 +141,22 @@ export const productsSlice = createSlice({
 	extraReducers: (builder) => {
 		builder.addCase(getProducts.fulfilled, (state, action) => {
 			const { products, hasMore, total } = action.payload
-			console.log(hasMore)
-			console.log(total)
 			state.value = products
 			state.hasMore = hasMore
 			state.total = total
 			state.loading = false
 		})
 		builder.addCase(getProducts.pending, (state) => {
+			state.loading = true
+		})
+		builder.addCase(getInfiniteProducts.fulfilled, (state, action) => {
+			const { products, hasMore, total } = action.payload
+			state.value = [...state.value, ...products]
+			state.hasMore = hasMore
+			state.total = total
+			state.loading = false
+		})
+		builder.addCase(getInfiniteProducts.pending, (state) => {
 			state.loading = true
 		})
 	},
@@ -132,6 +170,7 @@ export const {
 	setCategory,
 	setLimit,
 	setSearching,
+	setPage,
 } = productsSlice.actions
 
 export const productsReducer = productsSlice.reducer

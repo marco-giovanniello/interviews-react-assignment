@@ -13,7 +13,11 @@ import {
 import RemoveIcon from "@mui/icons-material/Remove"
 import AddIcon from "@mui/icons-material/Add"
 import { useAppDispatch, useAppSelector } from "../../../hooks/custom"
-import { getProducts, setLimit } from "../../../store/slices/productsSlice"
+import {
+	getInfiniteProducts,
+	getProducts,
+	setPage,
+} from "../../../store/slices/productsSlice"
 
 import { useCart } from "../../../hooks/useCart"
 
@@ -45,6 +49,12 @@ export const Products = () => {
 		searchQuery: products.search,
 		category: products.category,
 	}
+	const paginatedProductsQuery = {
+		limit: products.limit,
+		searchQuery: products.search,
+		category: products.category,
+		page: products.page,
+	}
 
 	const handleCart = useCart()
 
@@ -54,16 +64,25 @@ export const Products = () => {
 		dispatch(getProducts(productsQuery))
 	}, [products.limit, products.category, products.search])
 
+	useEffect(() => {
+		{
+			products.page !== 0 &&
+				dispatch(getInfiniteProducts(paginatedProductsQuery))
+		}
+	}, [products.page])
+
 	//Use of infinite scroll
 	useEffect(() => {
 		const handleScroll = (e: Event) => {
 			const scrollHeight = (e.target as Document).documentElement.scrollHeight
 			const currentHeight =
 				(e.target as Document).documentElement.scrollTop + window.innerHeight
-			if (currentHeight + 1 >= scrollHeight) {
-				console.log(products.loading)
-				console.log(products.hasMore)
-				if (!products.loading && products.hasMore) dispatch(setLimit())
+			if (
+				currentHeight + 1 >= scrollHeight &&
+				!products.loading &&
+				products.hasMore
+			) {
+				dispatch(setPage())
 			}
 		}
 		window.addEventListener("scroll", handleScroll)
@@ -73,16 +92,12 @@ export const Products = () => {
 	return (
 		<>
 			{products.total > 0 && (
-				<Box boxSizing="border-box" height="100%">
+				<Box boxSizing="border-box">
 					<Grid container spacing={2} p={2}>
 						{products.value.map((product) => (
 							<Grid key={product.id} item xs={4}>
 								{/* I removed :D */}
-								<Card
-									key={product.id}
-									style={{ width: "100%" }}
-									sx={{ position: "relative" }}
-								>
+								<Card style={{ width: "100%" }} sx={{ position: "relative" }}>
 									{product.loading && (
 										<Box
 											sx={{

@@ -1,15 +1,20 @@
 import {
 	Box,
-	Divider,
+	Drawer,
 	List,
 	ListItem,
 	ListItemButton,
 	ListItemText,
+	Toolbar,
 } from "@mui/material"
-import { useAppDispatch } from "../../../hooks/custom"
+import { useAppDispatch, useAppSelector } from "../../../hooks/custom"
 import { setCategory } from "../../../store/slices/productsSlice"
+import { closeDrawer } from "../../../store/slices/drawerSlice"
 
-const drawerWidth = 180
+const drawerWidth = {
+	xs: "80%",
+	sm: "20%",
+}
 
 const categories = [
 	"All",
@@ -25,20 +30,36 @@ const categories = [
 
 export const Categories = () => {
 	const dispatch = useAppDispatch()
+	const isDrawerOpened = useAppSelector((state) => state.drawer.value.open)
 
 	const handleCategoryClick = (text: string) => {
 		dispatch(setCategory(text))
 	}
 
 	return (
-		<Box minWidth={drawerWidth} sx={{ borderRight: "1px solid grey" }}>
-			<List
-				sx={{
-					padding: 1,
-				}}
-			>
-				{categories.map((text) => (
-					<>
+		<Drawer
+			variant="permanent"
+			open={isDrawerOpened}
+			onClose={() => dispatch(closeDrawer())}
+			sx={{
+				width: drawerWidth,
+				flexShrink: 0,
+				display: "flex",
+				justifyContent: "center",
+				alignItems: "center",
+				"& .MuiDrawer-paper": {
+					width: drawerWidth,
+				},
+			}}
+		>
+			<Toolbar />
+			<Box>
+				<List
+					sx={{
+						padding: 1,
+					}}
+				>
+					{categories.map((text) => (
 						<ListItem
 							onClick={() => handleCategoryClick(text)}
 							key={text}
@@ -54,10 +75,9 @@ export const Categories = () => {
 								/>
 							</ListItemButton>
 						</ListItem>
-						<Divider orientation="horizontal" />
-					</>
-				))}
-			</List>
-		</Box>
+					))}
+				</List>
+			</Box>
+		</Drawer>
 	)
 }

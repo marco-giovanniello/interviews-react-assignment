@@ -5,6 +5,7 @@ import {
 	Divider,
 	Drawer,
 	IconButton,
+	Toolbar,
 	Typography,
 } from "@mui/material"
 import { useAppDispatch, useAppSelector } from "../../../hooks/custom"
@@ -103,6 +104,7 @@ export default function CartDrawer() {
 					},
 				}}
 			>
+				<Toolbar />
 				<Box
 					height="100%"
 					display="flex"
@@ -125,8 +127,11 @@ export default function CartDrawer() {
 					)}
 
 					<Divider orientation="horizontal" />
+
 					<Box width="100%" paddingY={1}>
-						<Button fullWidth>Proceed to payment</Button>
+						{cart.items.length > 0 && (
+							<Button fullWidth>Proceed to payment</Button>
+						)}
 					</Box>
 				</Box>
 			</Drawer>

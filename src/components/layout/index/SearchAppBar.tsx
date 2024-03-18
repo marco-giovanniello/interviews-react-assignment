@@ -72,7 +72,12 @@ export default function SearchAppBar() {
 
 	return (
 		<Box>
-			<AppBar position="relative">
+			<AppBar
+				position="fixed"
+				sx={{
+					zIndex: (theme) => theme.zIndex.drawer + 1,
+				}}
+			>
 				<Toolbar>
 					<Avatar
 						sx={{
@@ -117,6 +122,7 @@ export default function SearchAppBar() {
 					</Box>
 				</Toolbar>
 			</AppBar>
+			<Toolbar />
 		</Box>
 	)
 }

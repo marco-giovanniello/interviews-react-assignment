@@ -1,12 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit"
 
+interface drawerState {
+	value: {
+		open: boolean
+	}
+}
+
+const initialState: drawerState = {
+	value: {
+		open: false,
+	},
+}
+
 export const drawerSlice = createSlice({
 	name: "drawer",
-	initialState: {
-		value: {
-			open: false,
-		},
-	},
+	initialState,
 	reducers: {
 		openDrawer: (state) => {
 			state.value.open = true

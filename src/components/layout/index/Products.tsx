@@ -20,6 +20,7 @@ import {
 } from "../../../store/slices/productsSlice"
 
 import { useCart } from "../../../hooks/useCart"
+import { theme } from "../../../style/theme"
 
 export type detailedCart = {
 	product: Product
@@ -44,6 +45,8 @@ export type Cart = {
 export const Products = () => {
 	const dispatch = useAppDispatch()
 	const products = useAppSelector((state) => state.products)
+	const isDrawerOpened = useAppSelector((state) => state.drawer.value.open)
+	const showCart = useAppSelector((state) => state.cart.showCart)
 	const productsQuery = {
 		limit: products.limit,
 		searchQuery: products.search,
@@ -92,10 +95,15 @@ export const Products = () => {
 	return (
 		<>
 			{products.total > 0 && (
-				<Box boxSizing="border-box">
+				<Box
+					boxSizing="border-box"
+					sx={{
+						...(isDrawerOpened && { display: { xs: "none", sm: "initial" } }),
+					}}
+				>
 					<Grid container spacing={2} p={2}>
 						{products.value.map((product) => (
-							<Grid key={product.id} item xs={4}>
+							<Grid key={product.id} item xs={6} sm={4} md={3} lg={2}>
 								{/* I removed :D */}
 								<Card style={{ width: "100%" }} sx={{ position: "relative" }}>
 									{product.loading && (
@@ -118,7 +126,7 @@ export const Products = () => {
 									)}
 									<CardMedia
 										component="img"
-										height="150"
+										width="20%"
 										image={product.imageUrl}
 									/>
 									<CardContent>
@@ -188,7 +196,7 @@ export const Products = () => {
 							</Grid>
 						))}
 					</Grid>
-					{products.loading && (
+					{products.loading && !showCart && (
 						<Box
 							width="100%"
 							display="flex"

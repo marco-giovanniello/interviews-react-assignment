@@ -13,6 +13,7 @@ import { useCart } from "../../../hooks/useCart"
 import { toggleShowCart } from "../../../store/slices/cartSlice"
 import RemoveIcon from "@mui/icons-material/Remove"
 import AddIcon from "@mui/icons-material/Add"
+import { Link } from "react-router-dom"
 
 export default function CartDrawer() {
 	const dispatch = useAppDispatch()
@@ -128,9 +129,22 @@ export default function CartDrawer() {
 
 					<Divider orientation="horizontal" />
 
+					<Box width="100%" padding={2} boxSizing="border-box">
+						<Typography variant="body1" textAlign="center">
+							Items in cart : {cart.totalItems || 0}
+						</Typography>
+						<Typography variant="body1" textAlign="center">
+							Subtotal price : ${(cart.totalPrice || 0).toFixed(2)}
+						</Typography>
+					</Box>
+
+					<Divider orientation="horizontal" />
+
 					<Box width="100%" paddingY={1}>
 						{cart.items.length > 0 && (
-							<Button fullWidth>Proceed to payment</Button>
+							<Link to="/checkout">
+								<Button fullWidth>Proceed to payment</Button>
+							</Link>
 						)}
 					</Box>
 				</Box>

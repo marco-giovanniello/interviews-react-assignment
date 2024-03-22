@@ -1,17 +1,19 @@
 import { styled, alpha } from "@mui/material/styles"
-import AppBar from "@mui/material/AppBar"
 import Box from "@mui/material/Box"
 import Toolbar from "@mui/material/Toolbar"
 import Typography from "@mui/material/Typography"
 import InputBase from "@mui/material/InputBase"
 import SearchIcon from "@mui/icons-material/Search"
-import { Avatar, Badge } from "@mui/material"
+import { Avatar, Badge, Divider, IconButton } from "@mui/material"
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart"
 import { useAppDispatch, useAppSelector } from "../../../hooks/custom"
 import { ChangeEvent } from "react"
 import { setSearching } from "../../../store/slices/productsSlice"
 import { toggleShowCart } from "../../../store/slices/cartSlice"
-import Logo from "/FreshCartMarket.svg"
+import Logo from "../../../assets/FreshCartMarket.svg"
+import { CustomAppBar } from "../../../style/components/customComponents/customComponents"
+import { openDrawer } from "../../../store/slices/drawerSlice"
+import { Menu } from "@mui/icons-material"
 
 const Search = styled("div")(({ theme }) => ({
 	position: "relative",
@@ -58,6 +60,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 export default function SearchAppBar() {
 	const cart = useAppSelector((state) => state.cart.value)
+	const isDrawerOpened = useAppSelector((state) => state.drawer.value.open)
 	const searchProducts = useAppSelector((state) => state.products.search)
 	const dispatch = useAppDispatch()
 	const handleCartIconClick = () => {
@@ -70,59 +73,70 @@ export default function SearchAppBar() {
 		dispatch(setSearching(target.value))
 	}
 
+	const handleOpenDrawer = () => {
+		dispatch(openDrawer())
+	}
+
 	return (
-		<Box>
-			<AppBar
-				position="fixed"
-				sx={{
-					zIndex: (theme) => theme.zIndex.drawer + 1,
-				}}
-			>
-				<Toolbar>
-					<Avatar
-						sx={{
-							mr: 1,
-						}}
-						src={Logo}
+		<CustomAppBar
+			open={isDrawerOpened}
+			position="fixed"
+			sx={{ overflowX: "hidden" }}
+		>
+			<Toolbar>
+				<IconButton
+					color="inherit"
+					aria-label="open drawer"
+					onClick={handleOpenDrawer}
+					edge="start"
+					sx={{
+						marginRight: 5,
+						...(isDrawerOpened && { display: "none" }),
+					}}
+				>
+					<Menu />
+				</IconButton>
+				<Avatar
+					sx={{
+						mr: 1,
+					}}
+					src={Logo}
+				/>
+				<Typography
+					variant="h6"
+					noWrap
+					component="div"
+					sx={{
+						flexGrow: 1,
+						display: { xs: "none", sm: "block" },
+					}}
+				>
+					FreshCart Market
+				</Typography>
+
+				<Search>
+					<SearchIconWrapper>
+						<SearchIcon />
+					</SearchIconWrapper>
+					<StyledInputBase
+						placeholder="Search…"
+						inputProps={{ "aria-label": "search" }}
+						onChange={handleInputChange}
+						value={searchProducts}
 					/>
-					<Typography
-						variant="h6"
-						noWrap
-						component="div"
-						sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
-					>
-						FreshCart Market
-					</Typography>
-					<Search>
-						<SearchIconWrapper>
-							<SearchIcon />
-						</SearchIconWrapper>
-						<StyledInputBase
-							placeholder="Search…"
-							inputProps={{ "aria-label": "search" }}
-							onChange={handleInputChange}
-							value={searchProducts}
+				</Search>
+
+				<Divider orientation="vertical" variant="middle" flexItem />
+
+				<Box padding={2}>
+					<Badge badgeContent={cart?.totalItems || 0} color="secondary">
+						<ShoppingCartIcon
+							sx={{ cursor: "pointer" }}
+							onClick={handleCartIconClick}
 						/>
-					</Search>
-					<Box display="flex" flexDirection="row" mx={2}>
-						<Typography variant="h6" noWrap component="div" mr={2}>
-							Total:
-						</Typography>
-						<Typography variant="h6" noWrap component="div">
-							$ {(cart?.totalPrice || 0).toFixed(2)}
-						</Typography>
-					</Box>
-					<Box>
-						<Badge badgeContent={cart?.totalItems || 0} color="secondary">
-							<ShoppingCartIcon
-								sx={{ cursor: "pointer" }}
-								onClick={handleCartIconClick}
-							/>
-						</Badge>
-					</Box>
-				</Toolbar>
-			</AppBar>
-			<Toolbar />
-		</Box>
+					</Badge>
+				</Box>
+			</Toolbar>
+		</CustomAppBar>
 	)
 }

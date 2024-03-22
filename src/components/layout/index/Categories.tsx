@@ -1,6 +1,5 @@
 import {
 	Divider,
-	Icon,
 	IconButton,
 	List,
 	ListItem,
@@ -28,11 +27,6 @@ import {
 	faFish,
 	faGlassWater,
 } from "@fortawesome/free-solid-svg-icons"
-
-const drawerWidth = {
-	xs: "80%",
-	sm: "20%",
-}
 
 const categories = [
 	{

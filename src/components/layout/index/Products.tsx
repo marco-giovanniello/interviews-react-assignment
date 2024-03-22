@@ -20,7 +20,6 @@ import {
 } from "../../../store/slices/productsSlice"
 
 import { useCart } from "../../../hooks/useCart"
-import { theme } from "../../../style/theme"
 
 export type detailedCart = {
 	product: Product

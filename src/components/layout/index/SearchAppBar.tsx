@@ -120,6 +120,7 @@ export default function SearchAppBar() {
 					</SearchIconWrapper>
 					<StyledInputBase
 						placeholder="Search…"
+						color="secondary"
 						inputProps={{ "aria-label": "search" }}
 						onChange={handleInputChange}
 						value={searchProducts}

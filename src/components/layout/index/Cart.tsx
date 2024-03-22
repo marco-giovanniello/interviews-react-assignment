@@ -44,7 +44,9 @@ export default function CartDrawer() {
 						{cartItem.product.category}
 					</Typography>
 				</Box>
-				<Typography variant="body1">${cartItem.product.price}</Typography>
+				<Typography color="secondary.dark" variant="body1">
+					${cartItem.product.price}
+				</Typography>
 				<Box
 					position="relative"
 					display="flex"
@@ -66,7 +68,12 @@ export default function CartDrawer() {
 						<RemoveIcon fontSize="small" />
 					</IconButton>
 
-					<Typography variant="body1" component="div" mx={1}>
+					<Typography
+						color="secondary.dark"
+						variant="body1"
+						component="div"
+						mx={1}
+					>
 						{cartItem.quantity || 0}
 					</Typography>
 
@@ -130,10 +137,18 @@ export default function CartDrawer() {
 					<Divider orientation="horizontal" />
 
 					<Box width="100%" padding={2} boxSizing="border-box">
-						<Typography variant="body1" textAlign="center">
+						<Typography
+							color="secondary.dark"
+							variant="body1"
+							textAlign="center"
+						>
 							Items in cart : {cart.totalItems || 0}
 						</Typography>
-						<Typography variant="body1" textAlign="center">
+						<Typography
+							color="secondary.dark"
+							variant="body1"
+							textAlign="center"
+						>
 							Subtotal price : ${(cart.totalPrice || 0).toFixed(2)}
 						</Typography>
 					</Box>
